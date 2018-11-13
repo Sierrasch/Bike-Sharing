@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Setup: Run "source setup $ENV", where ENV is the directory you want to put the virtual environment
 
 if [ -z $1 ]; then
     envdir="env"
@@ -13,4 +13,5 @@ if ! [ -d $envdir ]; then
 fi
 
 source ${envdir}/bin/activate
-pip install -r requirements.txt
+echo "Installing any missing packages from requirements.txt"
+pip install -q -r requirements.txt
