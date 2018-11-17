@@ -1,3 +1,5 @@
+
+from __future__ import print_function
 from numpy import *
 from ortools.graph import pywrapgraph
 
@@ -14,71 +16,66 @@ outBikes = sum(bikeData, axis=2)
 inBikes = sum(bikeData, axis=1)
 
 min_cost_flow = pywrapgraph.SimpleMinCostFlow()
-print(startingBikes)
 
 slots = days*(2*segments + 2)
-print(slots)
 
-for i in range(0, slots):
-    min_cost_flow.AddArcWithCapacityAndUnitCost(3*i, 3*(i+1), capacity, 0)
-    min_cost_flow.AddArcWithCapacityAndUnitCost(3*i+1, 3*(i+1)+1, capacity, 0)
-    min_cost_flow.AddArcWithCapacityAndUnitCost(3*i+2, 3*(i+1)+2, capacity, 0)
-
-
-for i in range(0, nodes):
-    min_cost_flow.SetNodeSupply(i, startingBikes[i])
-
-print(days*(2*segments + 2))
-for i in range(nodes, x):
-    min_cost_flow.SetNodeSupply(i, 0)
+# for i in range(0, slots):
+#     min_cost_flow.AddArcWithCapacityAndUnitCost(3*i, 3*(i+1), capacity, 0)
+#     min_cost_flow.AddArcWithCapacityAndUnitCost(3*i+1, 3*(i+1)+1, capacity, 0)
+#     min_cost_flow.AddArcWithCapacityAndUnitCost(3*i+2, 3*(i+1)+2, capacity, 0)
 
 
-
-# def main():
-
-# # Define four parallel arrays: start_nodes, end_nodes, capacities, and unit costs
-# # between each pair. For instance, the arc from node 0 to node 1 has a
-# # capacity of 15 and a unit cost of 4.
-
-#     start_nodes = [ 0, 0,  1, 1,  1,  2, 2,  3, 4]
-#     end_nodes   = [ 1, 2,  2, 3,  4,  3, 4,  4, 2]
-#     capacities  = [15, 8, 20, 4, 10, 15, 4, 20, 5]
-#     unit_costs  = [ 4, 4,  2, 2,  6,  1, 3,  2, 3]
-
-#     # Define an array of supplies at each node.
-
-#     supplies = [20, 0, 0, -5, -15]
+# for i in range(0, nodes):
+#     min_cost_flow.SetNodeSupply(i, startingBikes[i].item())
 
 
-#     # Instantiate a SimpleMinCostFlow solver.
-#     min_cost_flow = pywrapgraph.SimpleMinCostFlow()
+start_nodes = [ 0, 0,  0, 1, 1,  1, 2, 2,  2,  6,  7,  8,  9,  9,  9, 12, 12, 12, 13, 13, 13, 14, 14, 14, 18, 19, 20, 21, 22, 23 ]
+end_nodes =   [ 4, 5,  9, 3, 5, 10, 3, 4, 11,  9, 10, 11, 12, 13, 14, 16, 17, 21, 15, 17, 22, 15, 16, 23, 21, 22, 23, 24, 24, 24 ]
+capacities =  [ 0, 0, 90, 1, 4, 90, 2, 0, 90, 90, 90, 90, 90, 90, 90,  2,  0, 90,  3,  1, 90,  0,  0, 90, 90, 90, 90, 90, 90, 90 ]
+unit_costs =  [ 0, 0,  0, 0, 0,  0, 0, 0,  0,  0,  0,  0,  0,  1,  1,  1,  0,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 ]
 
-#     # Add each arc.
-#     for i in range(0, len(start_nodes)):
-#         min_cost_flow.AddArcWithCapacityAndUnitCost(start_nodes[i], end_nodes[i],
-#                                                 capacities[i], unit_costs[i])
+supplies = [
+    5, 5, 5,
+    -3, 0, -4,
+    3, 0, 4,
+    0, 0, 0,
+    -3, -2, -1,
+    3, 2, 1,
+    0, 0, 0,
+    0, 0, 0,
+    -15,
+]
 
-#     # Add node supplies.
+# start_nodes = [ 0, 0, 1, 1, 2, 2, 3, 3, 6, 7,  8,  9 ]
+# end_nodes   = [ 2, 3, 2, 3, 5, 8, 4, 9, 8, 9, 10, 10 ]
+# capacities  = [ 9, 9, 9, 9, 3, 9, 2, 9, 9, 9,  9,  9 ]
+# unit_costs  = [ 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,  0,  0 ]
 
-#     for i in range(0, len(supplies)):
-#         min_cost_flow.SetNodeSupply(i, supplies[i])
+# supplies = [ 1, 4, 0, 0, -2, -3, 2, 3, 0, 0, -5]
 
 
-#     # Find the minimum cost flow between node 0 and node 4.
-#     if min_cost_flow.Solve() == min_cost_flow.OPTIMAL:
-#         print('Minimum cost:', min_cost_flow.OptimalCost())
-#         print('')
-#         print('  Arc    Flow / Capacity  Cost')
-#         for i in range(min_cost_flow.NumArcs()):
-#             cost = min_cost_flow.Flow(i) * min_cost_flow.UnitCost(i)
-#             print('%1s -> %1s   %3s  / %3s       %3s' % (
-#                 min_cost_flow.Tail(i),
-#                 min_cost_flow.Head(i),
-#                 min_cost_flow.Flow(i),
-#                 min_cost_flow.Capacity(i),
-#                 cost))
-#     else:
-#         print('There was an issue with the min cost flow input.')
+# Add each arc.
+for i in range(0, len(start_nodes)):
+    min_cost_flow.AddArcWithCapacityAndUnitCost(start_nodes[i], end_nodes[i],
+                                            capacities[i], unit_costs[i])
 
-# if __name__ == '__main__':
-#     main()
+# Add node supplies.
+
+for i in range(0, len(supplies)):
+    min_cost_flow.SetNodeSupply(i, supplies[i])
+
+
+if min_cost_flow.Solve() == min_cost_flow.OPTIMAL:
+    print('Minimum cost:', min_cost_flow.OptimalCost())
+    print('')
+    print('  Arc    Flow / Capacity  Cost')
+    for i in range(min_cost_flow.NumArcs()):
+        cost = min_cost_flow.Flow(i) * min_cost_flow.UnitCost(i)
+        print('%1s -> %1s   %3s  / %3s       %3s' % (
+            min_cost_flow.Tail(i),
+            min_cost_flow.Head(i),
+            min_cost_flow.Flow(i),
+            min_cost_flow.Capacity(i),
+            cost))
+else:
+    print('There was an issue with the min cost flow input.')
