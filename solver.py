@@ -12,7 +12,7 @@ def main():
     days = setupData[0].item()
     segments = setupData[1].item() #number of intervals between costCycles
     nodes = setupData[2].item()
-    startingBikes = delete(setupData, [0,1,2,3])
+    startingBikes = delete(setupData, [0,1,2])
     totalBikes = sum(startingBikes)
 
     bikeData = reshape(loadtxt("input2.txt").astype(int), (2*segments*days, nodes, nodes))
@@ -98,11 +98,11 @@ def costCycle(graph, size, offset):
         graph.SetNodeSupply(offset+i, 0)
         for j in range(0, size):
             if(i == j):
-                print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + i + j, infinite, 0))
-                graph.AddArcWithCapacityAndUnitCost(offset - size + i, offset + i + j, infinite, 0)
+                print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + j, infinite, 0))
+                graph.AddArcWithCapacityAndUnitCost(offset - size + i, offset + j, infinite, 0)
             else:
-                print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + i + j, infinite, price))
-                graph.AddArcWithCapacityAndUnitCost(offset - size + i, offset + i + j, infinite, price)
+                print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + j, infinite, price))
+                graph.AddArcWithCapacityAndUnitCost(offset - size + i, offset + j, infinite, price)
 
 def end(graph, size, offset, totalBikes):
     print("\nStarting end")
