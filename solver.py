@@ -1,84 +1,115 @@
+
+from __future__ import print_function
 from numpy import *
 from ortools.graph import pywrapgraph
 
-setupData = loadtxt("input1.txt").astype(int)
-days = setupData[0]
-segments = setupData[1]
-nodes = setupData[2]
-startingBikes = delete(setupData, [0,1,2,3])
-capacity = 10000
+
+infinite = 100
 price = 1
 
-bikeData = reshape(loadtxt("input2.txt").astype(int), (4, 3, 3))
-outBikes = sum(bikeData, axis=2)
-inBikes = sum(bikeData, axis=1)
+def main():
+    setupData = loadtxt("input1.txt").astype(int)
+    days = setupData[0].item()
+    segments = setupData[1].item() #number of intervals between costCycles
+    nodes = setupData[2].item()
+    startingBikes = delete(setupData, [0,1,2])
+    totalBikes = sum(startingBikes)
 
-min_cost_flow = pywrapgraph.SimpleMinCostFlow()
-print(startingBikes)
+    bikeData = reshape(loadtxt("input2.txt").astype(int), (2*segments*days, nodes, nodes))
+    inBikes = sum(bikeData, axis=1)
 
-slots = days*(2*segments + 2)
-print(slots)
-
-for i in range(0, slots):
-    min_cost_flow.AddArcWithCapacityAndUnitCost(3*i, 3*(i+1), capacity, 0)
-    min_cost_flow.AddArcWithCapacityAndUnitCost(3*i+1, 3*(i+1)+1, capacity, 0)
-    min_cost_flow.AddArcWithCapacityAndUnitCost(3*i+2, 3*(i+1)+2, capacity, 0)
+    min_cost_flow = pywrapgraph.SimpleMinCostFlow()
 
 
-for i in range(0, nodes):
-    min_cost_flow.SetNodeSupply(i, startingBikes[i])
-
-print(days*(2*segments + 2))
-for i in range(nodes, x):
-    min_cost_flow.SetNodeSupply(i, 0)
-
-
-
-# def main():
-
-# # Define four parallel arrays: start_nodes, end_nodes, capacities, and unit costs
-# # between each pair. For instance, the arc from node 0 to node 1 has a
-# # capacity of 15 and a unit cost of 4.
-
-#     start_nodes = [ 0, 0,  1, 1,  1,  2, 2,  3, 4]
-#     end_nodes   = [ 1, 2,  2, 3,  4,  3, 4,  4, 2]
-#     capacities  = [15, 8, 20, 4, 10, 15, 4, 20, 5]
-#     unit_costs  = [ 4, 4,  2, 2,  6,  1, 3,  2, 3]
-
-#     # Define an array of supplies at each node.
-
-#     supplies = [20, 0, 0, -5, -15]
+    start(min_cost_flow, nodes, startingBikes)
+    offset = nodes
+    for i in range(0, 2*segments*days):
+        if(i % segments == 0):
+            costCycle(min_cost_flow, nodes, offset)
+            offset = offset + nodes
+        freeCycle(min_cost_flow, nodes, offset, i, bikeData, inBikes)
+        offset = offset + 3 * nodes
+    end(min_cost_flow, nodes, offset, totalBikes)
 
 
-#     # Instantiate a SimpleMinCostFlow solver.
-#     min_cost_flow = pywrapgraph.SimpleMinCostFlow()
-
-#     # Add each arc.
-#     for i in range(0, len(start_nodes)):
-#         min_cost_flow.AddArcWithCapacityAndUnitCost(start_nodes[i], end_nodes[i],
-#                                                 capacities[i], unit_costs[i])
-
-#     # Add node supplies.
-
-#     for i in range(0, len(supplies)):
-#         min_cost_flow.SetNodeSupply(i, supplies[i])
 
 
-#     # Find the minimum cost flow between node 0 and node 4.
-#     if min_cost_flow.Solve() == min_cost_flow.OPTIMAL:
-#         print('Minimum cost:', min_cost_flow.OptimalCost())
-#         print('')
-#         print('  Arc    Flow / Capacity  Cost')
-#         for i in range(min_cost_flow.NumArcs()):
-#             cost = min_cost_flow.Flow(i) * min_cost_flow.UnitCost(i)
-#             print('%1s -> %1s   %3s  / %3s       %3s' % (
-#                 min_cost_flow.Tail(i),
-#                 min_cost_flow.Head(i),
-#                 min_cost_flow.Flow(i),
-#                 min_cost_flow.Capacity(i),
-#                 cost))
-#     else:
-#         print('There was an issue with the min cost flow input.')
+    print(min_cost_flow.NumArcs())
 
-# if __name__ == '__main__':
-#     main()
+    if min_cost_flow.Solve() == min_cost_flow.OPTIMAL:
+        print('Minimum cost:', min_cost_flow.OptimalCost())
+        print('')
+        print('  Arc    Flow / Capacity  Cost')
+        for i in range(min_cost_flow.NumArcs()):
+            cost = min_cost_flow.Flow(i) * min_cost_flow.UnitCost(i)
+            print('%1s -> %1s   %3s  / %3s       %3s' % (
+                min_cost_flow.Tail(i),
+                min_cost_flow.Head(i),
+                min_cost_flow.Flow(i),
+                min_cost_flow.Capacity(i),
+                cost))
+    else:
+        print('There was an issue with the min cost flow input.')
+        print('  Arc    Capacity  Cost')
+        for i in range(min_cost_flow.NumArcs()):
+            print('%1s -> %2s   %3s  %4s' % (
+                min_cost_flow.Tail(i),
+                min_cost_flow.Head(i),
+                min_cost_flow.Capacity(i),
+                min_cost_flow.UnitCost(i),
+            ))
+        print('\n')
+        print('  Node   Supply')
+        for i in range(min_cost_flow.NumNodes()):
+            print('%1s : %2s' % (i, min_cost_flow.Supply(i)))
+
+
+def start(graph, size, data):
+    print("\nStarting start")
+    for i in range(0, size):
+        print('Node %1s with supply %2s' % (i, data[i].item()))
+        graph.SetNodeSupply(i, data[i].item())
+
+def freeCycle(graph, size, offset, time, data, sumData):
+    print("\nStarting freeCycle")
+    for i in range(0, size):
+        print('Node %1s with supply %2s' % ( offset+i, -1*sumData[time][i]))
+        graph.SetNodeSupply(offset+i, -1*sumData[time][i].item())
+        print('Node %1s with supply %2s' % ( offset+i+size, sumData[time][i]))
+        graph.SetNodeSupply(offset+i+size, sumData[time][i].item())
+        print('Node %1s with supply %2s' % ( offset+i+2*size, 0))
+        graph.SetNodeSupply(offset+i+2*size, 0)
+
+        print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + i + 2*size, infinite, 0))
+        graph.AddArcWithCapacityAndUnitCost(offset -size + i, offset + i + 2*size, infinite, 0)
+
+        for j in range (0, size):
+            if(j != i):
+                print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset + i - size, offset + j, data[time][i][j], 0))
+                graph.AddArcWithCapacityAndUnitCost(offset + i - size, offset + j, data[time][i][j].item(), 0)
+
+        print('Arc from %1s to %2s with capacity %3s and cost %4s' % (i + offset + size, i + offset + 2*size, infinite, 0))
+        graph.AddArcWithCapacityAndUnitCost(i + offset + size, i + offset + 2*size, infinite, 0)
+
+def costCycle(graph, size, offset):
+    print("\nStarting cost cycle")
+    for i in range(0, size):
+        print('Node %1s with supply %2s' % ( offset+i, 0))
+        graph.SetNodeSupply(offset+i, 0)
+        for j in range(0, size):
+            if(i == j):
+                print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + j, infinite, 0))
+                graph.AddArcWithCapacityAndUnitCost(offset - size + i, offset + j, infinite, 0)
+            else:
+                print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + j, infinite, price))
+                graph.AddArcWithCapacityAndUnitCost(offset - size + i, offset + j, infinite, price)
+
+def end(graph, size, offset, totalBikes):
+    print("\nStarting end")
+    graph.SetNodeSupply(offset, -1* totalBikes.item())
+    for i in range(0, size):
+        print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset + i - size, offset, infinite, 0))
+        graph.AddArcWithCapacityAndUnitCost(offset + i - size, offset, infinite, 0)
+
+if __name__ == '__main__':
+  main()
