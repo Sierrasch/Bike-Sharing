@@ -2,7 +2,7 @@
 from __future__ import print_function
 from numpy import *
 from ortools.graph import pywrapgraph
-
+import time
 
 infinite = 10000000
 price = 1
@@ -13,12 +13,13 @@ def main():
 
     #Change these parameters
     halfDays = 2
-    segments = 2 #I've defined segment to be the number of time slots between cycles, so there are 2*segment intervals in a day
-    nodes = 3
+    segments = 4 #I've defined segment to be the number of time slots between cycles, so there are 2*segment intervals in a day
+    nodes = 5
     initialBikes = 100000 #at each node
-    maxMovement = 8
-    numberOfTrials = 100000
+    maxMovement = 7
+    numberOfTrials = 10000
 
+    startTime = time.time()
     for trial in range(0, numberOfTrials):
         if( trial % 1000 == 0):
             print(trial)
@@ -49,6 +50,8 @@ def main():
         if min_cost_flow.Solve() == min_cost_flow.OPTIMAL:
             counter = counter + 1
 
+    endTime = time.time()
+    print('Runtime per trial: ' + str((endTime - startTime) / numberOfTrials))
     print('Finished\n %1s / %2s successful' % (counter, numberOfTrials))
 
 
