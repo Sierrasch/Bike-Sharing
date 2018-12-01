@@ -44,7 +44,7 @@ def main():
                 costCycle(min_cost_flow, nodes, offset)
                 offset = offset + nodes
             freeCycle(min_cost_flow, nodes, offset, i, bikeData, inBikes)
-            offset = offset + 3 * nodes
+            offset = offset + 2 * nodes
         end(min_cost_flow, nodes, offset, totalBikes)
 
 
@@ -70,10 +70,10 @@ def freeCycle(graph, size, offset, time, data, sumData):
         # print('Node %1s with supply %2s' % ( offset+i+size, sumData[time][i]))
         graph.SetNodeSupply(offset+i+size, sumData[time][i].item())
         # print('Node %1s with supply %2s' % ( offset+i+2*size, 0))
-        graph.SetNodeSupply(offset+i+2*size, 0)
+        # graph.SetNodeSupply(offset+i+2*size, 0)
 
-        # print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + i + 2*size, infinite, 0))
-        graph.AddArcWithCapacityAndUnitCost(offset -size + i, offset + i + 2*size, infinite, 0)
+        # print('Arc from %1s to %2s with capacity %3s and cost %4s' % (offset - size + i, offset + i + size, infinite, 0))
+        graph.AddArcWithCapacityAndUnitCost(offset - size + i, offset + i + size, infinite, 0)
 
         for j in range (0, size):
             if(j != i):
@@ -81,7 +81,7 @@ def freeCycle(graph, size, offset, time, data, sumData):
                 graph.AddArcWithCapacityAndUnitCost(offset + i - size, offset + j, data[time][i][j].item(), 0)
 
         # print('Arc from %1s to %2s with capacity %3s and cost %4s' % (i + offset + size, i + offset + 2*size, infinite, 0))
-        graph.AddArcWithCapacityAndUnitCost(i + offset + size, i + offset + 2*size, infinite, 0)
+        # graph.AddArcWithCapacityAndUnitCost(i + offset + size, i + offset + 2*size, infinite, 0)
 
 def costCycle(graph, size, offset):
     # print("\nStarting cost cycle")
