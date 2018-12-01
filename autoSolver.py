@@ -15,16 +15,17 @@ def main():
     halfDays = 2
     segments = 4 #I've defined segment to be the number of time slots between cycles, so there are 2*segment intervals in a day
     nodes = 5
-    initialBikes = 100000 #at each node
-    maxMovement = 7
-    numberOfTrials = 10000
+    initialBikes = 50 #total number of starting bikes
+    maxMovement = 3
+    numberOfTrials = 1000
 
     startTime = time.time()
     for trial in range(0, numberOfTrials):
         if( trial % 1000 == 0):
             print(trial)
 
-        startingBikes = full((nodes), initialBikes)
+        startingBikes = full((nodes), 0)
+        startingBikes[0] = initialBikes
         totalBikes = sum(startingBikes)
 
         bikeData = random.random_integers(0, maxMovement, size=(segments*halfDays, nodes, nodes))
