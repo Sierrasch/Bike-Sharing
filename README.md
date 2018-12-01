@@ -28,4 +28,4 @@ Total edge size of graph = 0 + (k*2*d*n^2) + (2*d*n^2) + n = n + (k+1)(2*d*n^2) 
 
 Edmund-Karp runs in VE^2, so time complexity should be = O( (k+1)^3 * (2*n*d) * (2*d*n^2)^2 )
 
-=O( k^3 * d^3 * n^5 )
+=O(k^3 * d^3 * n^5)

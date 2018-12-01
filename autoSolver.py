@@ -21,11 +21,12 @@ def main():
 
     startTime = time.time()
     for trial in range(0, numberOfTrials):
-        if( trial % 1000 == 0):
-            print(trial)
+        if( trial % 100 == 0):
+            print("Trial: " + str(trial))
 
         startingBikes = full((nodes), 0)
-        startingBikes[0] = initialBikes
+        for i in range(initialBikes):
+            startingBikes[random.randint(0, nodes)] += 1
         totalBikes = sum(startingBikes)
 
         bikeData = random.random_integers(0, maxMovement, size=(segments*halfDays, nodes, nodes))
